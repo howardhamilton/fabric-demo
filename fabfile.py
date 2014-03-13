@@ -55,7 +55,7 @@ def app():
         'chapman-hq',
         command='/var/lib/app/env/bin/pserve chapman/development.ini',
         directory=APP_HOME,
-        user='vagrant')
+        user=api.env.user)
 
 @api.task
 def proxy_nginx():
@@ -84,12 +84,9 @@ def proxy_nginx():
     FT.require.nginx.enabled('hq0')
 
 @api.task
-def make_user(username):
-    key_filename = api.env.key_filename
-    if isinstance(key_filename, basestring):
-        key_filename = [key_filename]
+def make_user(username, public_key):
     FT.require.user(
         username,
-        ssh_public_keys=['{}.pub'.format(key_filename[0])],
+        ssh_public_keys=[public_key],
         shell='/bin/bash')
     FT.require.sudoer(username)
